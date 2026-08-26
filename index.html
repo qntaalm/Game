@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>لعبة المتاهة — 6 مراحل</title>
+<title>لعبة المتاهة — 5 مراحل</title>
 <style>
 :root{--bg:#050816;--panel:#0b1230;--blue:#2d7dff;--yellow:#ffd51c;--text:#f5f7ff;--muted:#aab5d6;--danger:#ff3b4f}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#101b42,#050816 60%);color:var(--text);font-family:Tahoma,Arial,sans-serif;min-height:100vh}
@@ -21,7 +21,6 @@ button{font:inherit}.restart{width:100%;margin-top:14px;padding:11px;border-radi
 .notice{text-align:center;border:1px solid #2e4273;border-radius:10px;padding:10px;color:#dce4ff;margin-top:10px}.kbd{padding:2px 6px;border:1px solid #52638e;border-radius:5px;background:#101936}
 .overlay{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:20;padding:20px}.modal{width:min(520px,92vw);background:#0b1230;border:2px solid #3456a8;border-radius:18px;padding:25px;text-align:center;box-shadow:0 20px 80px #000}.modal h2{margin-top:0}.modal button{padding:10px 22px;border-radius:10px;border:0;background:var(--blue);color:white;cursor:pointer}
 
-/* تعديل تنسيق الفيديو وإضافة أنيميشن التكبير */
 #scareVideo {
   display: none;
   position: fixed;
@@ -59,7 +58,7 @@ button{font:inherit}.restart{width:100%;margin-top:14px;padding:11px;border-radi
 <div class="wrap">
   <aside class="panel">
     <div class="logo">PAC • MAZE</div>
-    <div class="stat"><div class="small">المستوى الحالي</div><div class="big" id="levelText">1 / 6</div><div id="difficulty" class="easy">مستوى الصعوبة: سهل</div></div>
+    <div class="stat"><div class="small">المستوى الحالي</div><div class="big" id="levelText">4 / 5</div><div id="difficulty" class="hard">مستوى الصعوبة: صعب</div></div>
     <div style="font-weight:800;margin-top:14px">اختر المرحلة</div>
     <div class="stages" id="stages"></div>
     <div class="stat">
@@ -68,12 +67,12 @@ button{font:inherit}.restart{width:100%;margin-top:14px;padding:11px;border-radi
       <div class="row"><span>❤️ المحاولات</span><b id="lives">3</b></div>
     </div>
     <button class="restart" id="restart">↻ إعادة المرحلة</button>
-    <p class="small" style="line-height:1.6">ابدأ من المرحلة 1. كل مرحلة تُفتح فقط بعد إنهاء المرحلة التي قبلها.</p>
+    <p class="small" style="line-height:1.6">المرحلة الرابعة مفتوحة للتجربة الفورية!</p>
   </aside>
 
   <main class="gamebox">
     <div class="topbar">
-      <div class="title" id="stageTitle">المرحلة 1</div>
+      <div class="title" id="stageTitle">المرحلة 4</div>
       <div class="hint">التحكم بالأسهم أو W A S D</div>
     </div>
     <canvas id="game" width="900" height="600"></canvas>
@@ -103,7 +102,6 @@ button{font:inherit}.restart{width:100%;margin-top:14px;padding:11px;border-radi
 const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
 const COLS=30,ROWS=20,CW=canvas.width/COLS,CH=canvas.height/ROWS;
 
-// محرك الصوت الداخلي (Web Audio API)
 let audioCtx = null;
 function initAudio() {
   if (!audioCtx) {
@@ -111,7 +109,6 @@ function initAudio() {
   }
 }
 
-// صوت جمع الكوين
 function playCoinSound() {
   initAudio();
   if (!audioCtx) return;
@@ -128,7 +125,6 @@ function playCoinSound() {
   osc.stop(audioCtx.currentTime + 0.08);
 }
 
-// صوت الاصطدام
 function playHitSound() {
   initAudio();
   if (!audioCtx) return;
@@ -145,7 +141,6 @@ function playHitSound() {
   osc.stop(audioCtx.currentTime + 0.25);
 }
 
-// صوت الفوز
 function playWinSound() {
   initAudio();
   if (!audioCtx) return;
@@ -165,6 +160,7 @@ function playWinSound() {
   osc.stop(now + 0.5);
 }
 
+// 4 مراحل أصلية
 const levels=[
  {
    difficulty:'سهل',
@@ -213,22 +209,6 @@ const levels=[
    ]
  },
  {
-   difficulty:'متوسط',
-   walls:[
-    [0,0,30,1],[0,19,30,1],[0,0,1,20],[29,0,1,20],
-    [2,2,8,2],[11,2,8,2],[20,2,8,2],
-    [2,5,2,8],[5,5,5,2],[11,5,8,2],[20,5,5,2],[26,5,2,8],
-    [5,8,2,6],[23,8,2,6],[8,9,4,2],[18,9,4,2],
-    [11,11,8,2],[11,14,8,2],
-    [2,15,7,3],[21,15,7,3]
-   ],
-   clusters:[
-    {startX: 1, startY: 1, endX: 28, endY: 1},
-    {startX: 14, startY: 8, endX: 15, endY: 8},
-    {startX: 1, startY: 18, endX: 28, endY: 18}
-   ]
- },
- {
    difficulty:'صعب',
    walls:[
     [0,0,30,1],[0,19,30,1],[0,0,1,20],[29,0,1,20],
@@ -247,8 +227,10 @@ const levels=[
  }
 ];
 
-let level=0,lives=3,player,ghosts,coins,started=false,scareShown=false,last=0,dir={x:0,y:0},nextDir={x:0,y:0};
-let unlocked=1;
+// بدء اللعبة مباشرة في المرحلة 4 (فهرس 3)
+let level=3,lives=3,player,ghosts,coins,started=false,scareShown=false,last=0,dir={x:0,y:0},nextDir={x:0,y:0};
+let unlocked=4; // فتح حتى المرحلة الرابعة لتجربتها مباشرة
+
 function key(x,y){return x+','+y}
 function rectsForWalls(){return levels[level].walls.map(a=>({x:a[0],y:a[1],w:a[2],h:a[3]}))}
 function blocked(x,y){
@@ -336,7 +318,7 @@ function update(dt){
  const initialCoinCount = coins.length;
  coins=coins.filter(c=>Math.hypot(c.x+.5-player.x,c.y+.5-player.y)>.45);
  if (coins.length < initialCoinCount) {
-   playCoinSound(); // تشغيل الصوت عند تجميع كوين
+   playCoinSound();
  }
 
  ghosts.forEach(g=>{
@@ -344,9 +326,12 @@ function update(dt){
    g.x+=g.vx*.075*dt;g.y+=g.vy*.075*dt;
    if(Math.hypot(g.x-player.x,g.y-player.y)<.65) hitGhost();
  });
- if(level===4&&!scareShown&&coins.length<Math.floor(makeCoins().length/2)){
+
+ // يظهر الفيديو في المرحلة الرابعة (فهرس 3) عند تجميع نصف الكوينز
+ if(level===3 && !scareShown && coins.length < Math.floor(makeCoins().length/2)){
    scareShown=true;triggerScare();
  }
+
  if(coins.length===0)win();
  updateUI();
 }
@@ -358,23 +343,22 @@ function hitGhost(){
  if(lives<=0){showModal('انتهت المحاولات','ستبدأ المرحلة من جديد.',()=>{lives=3;reset()})}
  else showModal('اصطدمت بشبح!','خسرت محاولة وستُعاد المرحلة.',()=>reset());
 }
+
 function win(){
  started=false;
  playWinSound();
- if(level<4){
+ if(level<3){
    unlocked=Math.max(unlocked,level+2);
    showModal('أحسنت! 🎉','جمعت جميع الكوينز. تم فتح المرحلة التالية.',()=>{level++;lives=3;buildStages();reset()});
  }else{
-   showModal('فوز! 🏆','أنهيت المراحل الخمس القابلة للعب!',()=>{level=0;lives=3;unlocked=1;buildStages();reset()});
+   showModal('فوز! 🏆','أنهيت جميع المراحل 4 القابلة للعب!',()=>{level=0;lives=3;unlocked=4;buildStages();reset()});
  }
 }
+
 function showModal(t,txt,cb){document.getElementById('modalTitle').textContent=t;document.getElementById('modalText').textContent=txt;document.getElementById('modal').style.display='flex';document.getElementById('modalBtn').onclick=()=>{document.getElementById('modal').style.display='none';cb()}}
 
-// تعديل دالة تشغيل فيديو الرعب لاستخدام كلاس الأنيميشن
 function triggerScare(){
  const v=document.getElementById('scareVideo');
- if(!v.querySelector('source').src){showModal('لحظة!','ضع فيديو الرعب الخاص بك في خانة الفيديو داخل الملف ثم أعد تشغيل اللعبة.',()=>{});return}
- 
  v.classList.add('active');
  v.currentTime=0;
  v.play().catch(()=>{});
@@ -387,21 +371,23 @@ function triggerScare(){
 }
 
 function updateUI(){
- document.getElementById('levelText').textContent=(level+1)+' / 6';
+ document.getElementById('levelText').textContent=(level+1)+' / 5';
  document.getElementById('stageTitle').textContent='المرحلة '+(level+1);
  document.getElementById('difficulty').textContent='مستوى الصعوبة: '+levels[level].difficulty;
- document.getElementById('difficulty').className=level<2?'easy':level<4?'med':'hard';
+ document.getElementById('difficulty').className=level<2?'easy':level<3?'med':'hard';
  document.getElementById('coinText').textContent=(makeCoins().length-coins.length)+' / '+makeCoins().length;
  document.getElementById('lives').textContent=lives;
- document.getElementById('notice').textContent=level===4?'اجمع كل الكوينز للفوز بالمرحلة!':'اجمع كل الكوينز للفوز بالمرحلة!';
+ document.getElementById('notice').textContent='اجمع كل الكوينز للفوز بالمرحلة!';
 }
+
 function buildStages(){
  const box=document.getElementById('stages');box.innerHTML='';
- for(let i=0;i<6;i++){
+ // إنشاء 5 مراحل (4 أصلية قابلة للعب + 1 وهمية)
+ for(let i=0;i<5;i++){
    const b=document.createElement('button');
-   const canEnter=i<5 && i<unlocked;
+   const canEnter=i<4 && i<unlocked;
    b.className='stage '+(i===level?'active':'')+(!canEnter?' locked':'');
-   b.innerHTML='<span class="row"><b>المرحلة '+(i+1)+'</b><span class="'+(i<2?'easy':i<4?'med':'hard')+'">'+(i<2?'سهل':i<4?'متوسط':'صعب')+(canEnter?'':' 🔒')+'</span></span>';
+   b.innerHTML='<span class="row"><b>المرحلة '+(i+1)+'</b><span class="'+(i<2?'easy':i<3?'med':'hard')+'">'+(i<2?'سهل':i<3?'متوسط':'صعب')+(canEnter?'':' 🔒')+'</span></span>';
    b.onclick=()=>{
      if(canEnter){
        level=i;lives=3;buildStages();reset();
@@ -410,6 +396,7 @@ function buildStages(){
    box.appendChild(b);
  }
 }
+
 function draw(){
  ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#000';ctx.fillRect(0,0,canvas.width,canvas.height);
  
@@ -431,11 +418,13 @@ function draw(){
   ctx.fillStyle='#14204d';ctx.beginPath();ctx.arc(x-r*.3,y-r*.12,r*.1,0,7);ctx.arc(x+r*.3,y-r*.12,r*.1,0,7);ctx.fill();
  });
 }
+
 function loop(t){const dt=Math.min(2,(t-last)/16.67||1);last=t;update(dt);draw();requestAnimationFrame(loop)}
 function setDir(name){
  initAudio();
  nextDir={up:{x:0,y:-1},down:{x:0,y:1},left:{x:-1,y:0},right:{x:1,y:0}}[name];
 }
+
 document.addEventListener('keydown',e=>{
  initAudio();
  const m={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',W:'up',s:'down',S:'down',a:'left',A:'left',d:'right',D:'right'};
@@ -443,6 +432,7 @@ document.addEventListener('keydown',e=>{
 });
 document.querySelectorAll('[data-dir]').forEach(b=>{b.addEventListener('pointerdown',()=>setDir(b.dataset.dir))});
 document.getElementById('restart').onclick=()=>{lives=3;reset()};
+
 buildStages();reset();requestAnimationFrame(loop);
 </script>
 </body>
