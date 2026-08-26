@@ -20,7 +20,38 @@ button{font:inherit}.restart{width:100%;margin-top:14px;padding:11px;border-radi
 .up{grid-column:2}.left{grid-column:1}.down{grid-column:2}.right{grid-column:3}
 .notice{text-align:center;border:1px solid #2e4273;border-radius:10px;padding:10px;color:#dce4ff;margin-top:10px}.kbd{padding:2px 6px;border:1px solid #52638e;border-radius:5px;background:#101936}
 .overlay{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:20;padding:20px}.modal{width:min(520px,92vw);background:#0b1230;border:2px solid #3456a8;border-radius:18px;padding:25px;text-align:center;box-shadow:0 20px 80px #000}.modal h2{margin-top:0}.modal button{padding:10px 22px;border-radius:10px;border:0;background:var(--blue);color:white;cursor:pointer}
-#scareVideo{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);max-width:80vw;max-height:80vh;border:3px solid var(--blue);border-radius:16px;box-shadow:0 0 30px #000;z-index:50}
+
+/* تعديل تنسيق الفيديو وإضافة أنيميشن التكبير */
+#scareVideo {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  max-width: 80vw;
+  max-height: 80vh;
+  border: 3px solid var(--blue);
+  border-radius: 16px;
+  box-shadow: 0 0 30px #000;
+  z-index: 50;
+}
+
+#scareVideo.active {
+  display: block;
+  animation: zoomIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards;
+}
+
+@keyframes zoomIn {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
 @media(max-width:800px){.wrap{grid-template-columns:1fr}.panel{order:2}.gamebox{order:1}.logo{font-size:25px}}
 </style>
 </head>
@@ -338,11 +369,23 @@ function win(){
  }
 }
 function showModal(t,txt,cb){document.getElementById('modalTitle').textContent=t;document.getElementById('modalText').textContent=txt;document.getElementById('modal').style.display='flex';document.getElementById('modalBtn').onclick=()=>{document.getElementById('modal').style.display='none';cb()}}
+
+// تعديل دالة تشغيل فيديو الرعب لاستخدام كلاس الأنيميشن
 function triggerScare(){
  const v=document.getElementById('scareVideo');
  if(!v.querySelector('source').src){showModal('لحظة!','ضع فيديو الرعب الخاص بك في خانة الفيديو داخل الملف ثم أعد تشغيل اللعبة.',()=>{});return}
- v.style.display='block';v.currentTime=0;v.play().catch(()=>{});setTimeout(()=>{v.pause();v.style.display='none'},Math.min(7000,(v.duration||7)*1000));
+ 
+ v.classList.add('active');
+ v.currentTime=0;
+ v.play().catch(()=>{});
+ 
+ setTimeout(()=>{
+   v.pause();
+   v.classList.remove('active');
+   v.style.display='none';
+ },Math.min(7000,(v.duration||7)*1000));
 }
+
 function updateUI(){
  document.getElementById('levelText').textContent=(level+1)+' / 6';
  document.getElementById('stageTitle').textContent='المرحلة '+(level+1);
@@ -390,13 +433,13 @@ function draw(){
 }
 function loop(t){const dt=Math.min(2,(t-last)/16.67||1);last=t;update(dt);draw();requestAnimationFrame(loop)}
 function setDir(name){
-  initAudio();
-  nextDir={up:{x:0,y:-1},down:{x:0,y:1},left:{x:-1,y:0},right:{x:1,y:0}}[name];
+ initAudio();
+ nextDir={up:{x:0,y:-1},down:{x:0,y:1},left:{x:-1,y:0},right:{x:1,y:0}}[name];
 }
 document.addEventListener('keydown',e=>{
-  initAudio();
-  const m={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',W:'up',s:'down',S:'down',a:'left',A:'left',d:'right',D:'right'};
-  if(m[e.key]){e.preventDefault();setDir(m[e.key])}
+ initAudio();
+ const m={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',W:'up',s:'down',S:'down',a:'left',A:'left',d:'right',D:'right'};
+ if(m[e.key]){e.preventDefault();setDir(m[e.key])}
 });
 document.querySelectorAll('[data-dir]').forEach(b=>{b.addEventListener('pointerdown',()=>setDir(b.dataset.dir))});
 document.getElementById('restart').onclick=()=>{lives=3;reset()};
