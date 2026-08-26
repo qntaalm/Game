@@ -3,25 +3,36 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>لعبة المتاهة — 5 مراحل</title>
+<title>Pac-Man Game</title>
+
+<!-- يمكنك تغيير رابط أيقونة الموقع هنا -->
+<link rel="icon" type="image/x-icon" href="pacman.png">
+
 <style>
 :root{--bg:#050816;--panel:#0b1230;--blue:#2d7dff;--yellow:#ffd51c;--text:#f5f7ff;--muted:#aab5d6;--danger:#ff3b4f}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#101b42,#050816 60%);color:var(--text);font-family:Tahoma,Arial,sans-serif;min-height:100vh}
 .wrap{width:min(1200px,96vw);margin:18px auto;display:grid;grid-template-columns:250px 1fr;gap:16px;direction:ltr}
 .panel,.gamebox{background:rgba(8,14,39,.92);border:1px solid #263b78;border-radius:18px;box-shadow:0 15px 50px #0008}
-.panel{padding:18px;direction:rtl}.logo{font-weight:900;font-size:30px;letter-spacing:2px;color:var(--yellow);text-align:center;margin-bottom:12px}
+.panel{padding:18px;direction:rtl;display:flex;flex-direction:column;justify-content:space-between}.logo{font-weight:900;font-size:30px;letter-spacing:2px;color:var(--yellow);text-align:center;margin-bottom:6px}
 .stat{border:1px solid #31457e;border-radius:12px;padding:12px;text-align:center;margin:10px 0}.big{font-size:34px;font-weight:900}.easy{color:#32e875}.med{color:#4cb5ff}.hard{color:#ff5a68}
 .stages{display:grid;gap:7px;margin-top:8px}.stage{width:100%;padding:10px;border:1px solid #2c467e;border-radius:10px;background:#0d1738;color:white;cursor:pointer;text-align:right}.stage:hover{filter:brightness(1.2)}.stage.active{border-color:var(--yellow);box-shadow:0 0 12px #ffd51c44}.stage.locked{opacity:.45;cursor:not-allowed}
 .row{display:flex;justify-content:space-between;align-items:center;gap:8px}.small{font-size:12px;color:var(--muted)}
 button{font:inherit}.restart{width:100%;margin-top:14px;padding:11px;border-radius:11px;border:1px solid var(--blue);background:#0d2c6d;color:white;cursor:pointer}
 .gamebox{padding:14px;direction:rtl}.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}.title{font-size:20px;font-weight:800}.hint{color:var(--muted);font-size:13px}
 #game{display:block;width:100%;max-width:900px;margin:auto;background:#000;border:3px solid #1d6dff;border-radius:14px;image-rendering:pixelated}
-.controls{display:grid;grid-template-columns:repeat(3,65px);grid-template-rows:repeat(2,55px);gap:7px;justify-content:center;margin:13px auto 5px;direction:ltr}.controls button{border:1px solid #40527e;background:#111a38;color:white;border-radius:12px;font-size:25px;cursor:pointer}.controls button:active{transform:scale(.95);background:#1c326d}
+.controls{display:grid;grid-template-columns:repeat(3,65px);grid-template-rows:repeat(2,55px);gap:7px;justify-content:center;margin:8px auto 5px;direction:ltr}.controls button{border:1px solid #40527e;background:#111a38;color:white;border-radius:12px;font-size:25px;cursor:pointer}.controls button:active{transform:scale(.95);background:#1c326d}
 .up{grid-column:2}.left{grid-column:1}.down{grid-column:2}.right{grid-column:3}
 .notice{text-align:center;border:1px solid #2e4273;border-radius:10px;padding:10px;color:#dce4ff;margin-top:10px}.kbd{padding:2px 6px;border:1px solid #52638e;border-radius:5px;background:#101936}
 .overlay{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:20;padding:20px}.modal{width:min(520px,92vw);background:#0b1230;border:2px solid #3456a8;border-radius:18px;padding:25px;text-align:center;box-shadow:0 20px 80px #000}.modal h2{margin-top:0}.modal button{padding:10px 22px;border-radius:10px;border:0;background:var(--blue);color:white;cursor:pointer}
 
-/* تنسيق الفيديو للحركة المنطلقة من الباك مان */
+.copyright-controls {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 14px;
+  color: RED;
+  font-weight: bold;
+}
+
 #scareVideo {
   display: none;
   position: fixed;
@@ -63,25 +74,32 @@ button{font:inherit}.restart{width:100%;margin-top:14px;padding:11px;border-radi
 <body>
 <div class="wrap">
   <aside class="panel">
-    <div class="logo">PAC • MAZE</div>
-    <div class="stat"><div class="small">المستوى الحالي</div><div class="big" id="levelText">4 / 5</div><div id="difficulty" class="hard">مستوى الصعوبة: صعب</div></div>
-    <div style="font-weight:800;margin-top:14px">اختر المرحلة</div>
-    <div class="stages" id="stages"></div>
-    <div class="stat">
-      <div class="row"><span>🟡 الكوينز</span><b id="coinText">0 / 0</b></div>
-      <hr style="border:0;border-top:1px solid #26375f">
-      <div class="row"><span>❤️ المحاولات</span><b id="lives">3</b></div>
+    <div>
+      <div class="logo">PAC • MAZE</div>
+      <div class="stat"><div class="small">المستوى الحالي</div><div class="big" id="levelText">1 / 5</div><div id="difficulty" class="easy">مستوى الصعوبة: سهل</div></div>
+      <div style="font-weight:800;margin-top:14px">اختر المرحلة</div>
+      <div class="stages" id="stages"></div>
+      <div class="stat">
+        <div class="row"><span>🟡 الكوينز</span><b id="coinText">0 / 0</b></div>
+        <hr style="border:0;border-top:1px solid #26375f">
+        <div class="row"><span>❤️ المحاولات</span><b id="lives">3</b></div>
+      </div>
+      <button class="restart" id="restart">↻ إعادة المرحلة</button>
+      <p class="small" style="line-height:1.6">ابدأ من المرحلة 1. كل مرحلة تُفتح فقط بعد إنهاء المرحلة التي قبلها.</p>
     </div>
-    <button class="restart" id="restart">↻ إعادة المرحلة</button>
-    <p class="small" style="line-height:1.6">المرحلة الرابعة مفتوحة للتجربة الفورية!</p>
   </aside>
 
   <main class="gamebox">
     <div class="topbar">
-      <div class="title" id="stageTitle">المرحلة 4</div>
+      <div class="title" id="stageTitle">المرحلة 1</div>
       <div class="hint">التحكم بالأسهم أو W A S D</div>
     </div>
     <canvas id="game" width="900" height="600"></canvas>
+    
+    <div class="copyright-controls">
+      تمت البرمجة بواسطة: أبو أحمد سكيك & شات جي بي تي
+    </div>
+
     <div class="controls" aria-label="أزرار التحكم">
       <button class="up" data-dir="up">↑</button>
       <button class="left" data-dir="left">←</button>
@@ -232,8 +250,8 @@ const levels=[
  }
 ];
 
-let level=3,lives=3,player,ghosts,coins,started=false,scareShown=false,last=0,dir={x:0,y:0},nextDir={x:0,y:0};
-let unlocked=4;
+let level=0,lives=3,player,ghosts,coins,started=false,scareShown=false,last=0,dir={x:0,y:0},nextDir={x:0,y:0};
+let unlocked=1;
 
 function key(x,y){return x+','+y}
 function rectsForWalls(){return levels[level].walls.map(a=>({x:a[0],y:a[1],w:a[2],h:a[3]}))}
@@ -354,13 +372,12 @@ function win(){
    unlocked=Math.max(unlocked,level+2);
    showModal('أحسنت! 🎉','جمعت جميع الكوينز. تم فتح المرحلة التالية.',()=>{level++;lives=3;buildStages();reset()});
  }else{
-   showModal('فوز! 🏆','أنهيت جميع المراحل 4 القابلة للعب!',()=>{level=0;lives=3;unlocked=4;buildStages();reset()});
+   showModal('فوز! 🏆','أنهيت جميع المراحل القابلة للعب!',()=>{level=0;lives=3;unlocked=1;buildStages();reset()});
  }
 }
 
 function showModal(t,txt,cb){document.getElementById('modalTitle').textContent=t;document.getElementById('modalText').textContent=txt;document.getElementById('modal').style.display='flex';document.getElementById('modalBtn').onclick=()=>{document.getElementById('modal').style.display='none';cb()}}
 
-// احتساب موقع الباك مان على الشاشة وانطلاق الفيديو منه
 function triggerScare(){
  const v=document.getElementById('scareVideo');
  const canvasRect = canvas.getBoundingClientRect();
