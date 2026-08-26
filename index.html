@@ -21,6 +21,7 @@ button{font:inherit}.restart{width:100%;margin-top:14px;padding:11px;border-radi
 .notice{text-align:center;border:1px solid #2e4273;border-radius:10px;padding:10px;color:#dce4ff;margin-top:10px}.kbd{padding:2px 6px;border:1px solid #52638e;border-radius:5px;background:#101936}
 .overlay{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:20;padding:20px}.modal{width:min(520px,92vw);background:#0b1230;border:2px solid #3456a8;border-radius:18px;padding:25px;text-align:center;box-shadow:0 20px 80px #000}.modal h2{margin-top:0}.modal button{padding:10px 22px;border-radius:10px;border:0;background:var(--blue);color:white;cursor:pointer}
 
+/* تنسيق الفيديو للحركة المنطلقة من الباك مان */
 #scareVideo {
   display: none;
   position: fixed;
@@ -33,19 +34,24 @@ button{font:inherit}.restart{width:100%;margin-top:14px;padding:11px;border-radi
   border-radius: 16px;
   box-shadow: 0 0 30px #000;
   z-index: 50;
+  transform-origin: center center;
 }
 
 #scareVideo.active {
   display: block;
-  animation: zoomIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards;
+  animation: explodeFromPacman 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards;
 }
 
-@keyframes zoomIn {
+@keyframes explodeFromPacman {
   0% {
+    top: var(--start-y, 50%);
+    left: var(--start-x, 50%);
     transform: translate(-50%, -50%) scale(0);
     opacity: 0;
   }
   100% {
+    top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%) scale(1);
     opacity: 1;
   }
@@ -160,7 +166,6 @@ function playWinSound() {
   osc.stop(now + 0.5);
 }
 
-// 4 مراحل أصلية
 const levels=[
  {
    difficulty:'سهل',
@@ -227,9 +232,8 @@ const levels=[
  }
 ];
 
-// بدء اللعبة مباشرة في المرحلة 4 (فهرس 3)
 let level=3,lives=3,player,ghosts,coins,started=false,scareShown=false,last=0,dir={x:0,y:0},nextDir={x:0,y:0};
-let unlocked=4; // فتح حتى المرحلة الرابعة لتجربتها مباشرة
+let unlocked=4;
 
 function key(x,y){return x+','+y}
 function rectsForWalls(){return levels[level].walls.map(a=>({x:a[0],y:a[1],w:a[2],h:a[3]}))}
@@ -327,7 +331,6 @@ function update(dt){
    if(Math.hypot(g.x-player.x,g.y-player.y)<.65) hitGhost();
  });
 
- // يظهر الفيديو في المرحلة الرابعة (فهرس 3) عند تجميع نصف الكوينز
  if(level===3 && !scareShown && coins.length < Math.floor(makeCoins().length/2)){
    scareShown=true;triggerScare();
  }
@@ -357,8 +360,20 @@ function win(){
 
 function showModal(t,txt,cb){document.getElementById('modalTitle').textContent=t;document.getElementById('modalText').textContent=txt;document.getElementById('modal').style.display='flex';document.getElementById('modalBtn').onclick=()=>{document.getElementById('modal').style.display='none';cb()}}
 
+// احتساب موقع الباك مان على الشاشة وانطلاق الفيديو منه
 function triggerScare(){
  const v=document.getElementById('scareVideo');
+ const canvasRect = canvas.getBoundingClientRect();
+ 
+ const pacmanCanvasX = player.x * CW;
+ const pacmanCanvasY = player.y * CH;
+ 
+ const startX = canvasRect.left + (pacmanCanvasX * (canvasRect.width / canvas.width));
+ const startY = canvasRect.top + (pacmanCanvasY * (canvasRect.height / canvas.height));
+
+ v.style.setProperty('--start-x', startX + 'px');
+ v.style.setProperty('--start-y', startY + 'px');
+
  v.classList.add('active');
  v.currentTime=0;
  v.play().catch(()=>{});
@@ -382,7 +397,6 @@ function updateUI(){
 
 function buildStages(){
  const box=document.getElementById('stages');box.innerHTML='';
- // إنشاء 5 مراحل (4 أصلية قابلة للعب + 1 وهمية)
  for(let i=0;i<5;i++){
    const b=document.createElement('button');
    const canEnter=i<4 && i<unlocked;
